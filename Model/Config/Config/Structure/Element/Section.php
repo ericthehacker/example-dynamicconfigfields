@@ -3,23 +3,23 @@
 namespace EW\DynamicConfigFields\Model\Config\Config\Structure\Element;
 
 use \Magento\Config\Model\Config\Structure\Element\Section as OriginalSection;
-use Magento\Directory\Api\CountryInformationAcquirerInterface;
-use Magento\Directory\Api\Data\CountryInformationInterface;
+use \Magento\Directory\Api\CountryInformationAcquirerInterface;
+use \Magento\Directory\Api\Data\CountryInformationInterface;
 use \EW\DynamicConfigFields\Helper\Config as ConfigHelper;
 use \Magento\Directory\Helper\Data as DirectoryHelper;
 
 /**
  * Plugin to add dynamically generated groups to
- * General -> General tab.
+ * General -> General section.
  *
  * @package EW\DynamicConfigFields\Model\Config\Config\Structure\Element
  */
 class Section
 {
     /**
-     * Config path of target tab
+     * Config path of target section
      */
-    const CONFIG_GENERAL_TAB_ID = 'general';
+    const CONFIG_GENERAL_SECTION_ID = 'general';
 
     /**
      * @var \Magento\Directory\Helper\Data
@@ -66,14 +66,14 @@ class Section
     }
 
     /**
-     * Get dynamic config sections (if any)
+     * Get dynamic config groups (if any)
      *
      * @return array
      */
-    protected function getDynamicConfigSections() : array {
+    protected function getDynamicConfigGroups() : array {
         $countriesWithStatesRequired = $this->directoryHelper->getCountriesWithStatesRequired();
 
-        $dynamicConfigSections = [];
+        $dynamicConfigGroups = [];
         foreach($countriesWithStatesRequired as $index => $country) {
             // Use a consistent prefix for dynamically generated fields
             // to allow them to be deterministic but not collide with any
@@ -106,10 +106,10 @@ class Section
                             $countryInfo->getFullNameEnglish()
                         ),
                         '_elementType' => 'field',
-                        'path' => implode(            // Compute group path from tab ID and dynamic group ID
+                        'path' => implode(            // Compute group path from section ID and dynamic group ID
                             '/',
                             [
-                                self::CONFIG_GENERAL_TAB_ID,
+                                self::CONFIG_GENERAL_SECTION_ID,
                                 ConfigHelper::ALLOWED_REGIONS_SECTION_CONFIG_PATH_PREFIX . $country
                             ]
                         )
@@ -129,10 +129,10 @@ class Section
                             $countryInfo->getFullNameEnglish()
                         ),
                         '_elementType' => 'field',
-                        'path' => implode(            // Compute group path from tab ID and dynamic group ID
+                        'path' => implode(            // Compute group path from section ID and dynamic group ID
                             '/',
                             [
-                                self::CONFIG_GENERAL_TAB_ID,
+                                self::CONFIG_GENERAL_SECTION_ID,
                                 ConfigHelper::ALLOWED_REGIONS_SECTION_CONFIG_PATH_PREFIX . $country
                             ]
                         )
@@ -140,7 +140,7 @@ class Section
                     break;
             }
 
-            $dynamicConfigSections[$country] = [    // Declare group information
+            $dynamicConfigGroups[$country] = [    // Declare group information
                 'id' => $country,                   // Use dynamic group ID
                 'label' => __(
                     '%1 Allowed Regions',
@@ -154,11 +154,11 @@ class Section
             ];
         }
 
-        return $dynamicConfigSections;
+        return $dynamicConfigGroups;
     }
 
     /**
-     * Add dynamic region config sections for each country configured
+     * Add dynamic region config groups for each country configured
      *
      * @param OriginalSection $subject
      * @param callable $proceed
@@ -167,14 +167,14 @@ class Section
      * @return mixed
      */
     public function aroundSetData(OriginalSection $subject, callable $proceed, array $data, $scope) {
-        // This method runs for every tab.
+        // This method runs for every section.
         // Add a condition to check for the one to which we're
         // interested in adding groups.
-        if($data['id'] == self::CONFIG_GENERAL_TAB_ID) {
-            $dynamicSections = $this->getDynamicConfigSections();
+        if($data['id'] == self::CONFIG_GENERAL_SECTION_ID) {
+            $dynamicGroups = $this->getDynamicConfigGroups();
 
-            if(!empty($dynamicSections)) {
-                $data['children'] += $dynamicSections;
+            if(!empty($dynamicGroups)) {
+                $data['children'] += $dynamicGroups;
             }
         }
 

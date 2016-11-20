@@ -3,8 +3,8 @@
 namespace EW\DynamicConfigFields\Model\Config\Config\Structure\Element;
 
 use \Magento\Config\Model\Config\Structure\Element\Group as OriginalGroup;
-use Magento\Directory\Api\CountryInformationAcquirerInterface;
-use Magento\Directory\Api\Data\CountryInformationInterface;
+use \Magento\Directory\Api\CountryInformationAcquirerInterface;
+use \Magento\Directory\Api\Data\CountryInformationInterface;
 use \EW\DynamicConfigFields\Helper\Config as ConfigHelper;
 use \Magento\Directory\Helper\Data as DirectoryHelper;
 
